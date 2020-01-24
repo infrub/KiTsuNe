@@ -4,12 +4,7 @@ eval_input: testlist _NEWLINE*
 
 funcdef: "def" NAME "(" parameters? ")" ["->" test] ":" suite
 
-parameters: paramvalue ("," paramvalue)* ["," [ starparams | kwparams]]
-          | starparams
-          | kwparams
-starparams: "*" typedparam? ("," paramvalue)* ["," kwparams]
-kwparams: "**" typedparam
-
+parameters: paramvalue ("," paramvalue)*
 ?paramvalue: typedparam ["=" test]
 ?typedparam: NAME [":" test]
 
