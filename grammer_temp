@@ -1,0 +1,53 @@
+
+?statement: declare_with_value
+    | declare_with_type
+    | assignment
+    | expression
+    | function_def
+    | return_statement
+
+declare_with_type: "var" new_symbol ":" type
+declare_with_value: "var" new_symbol "=" expression
+assignment: symbol "=" expression
+function_def: "proc" new_symbol "(" [expression ":" type ("," expression ":" type)*] ")" ":" type "=" [_INDENT statement+ _DEDENT]
+return_statement: "return" expression
+
+
+?expression: level8
+    | function_call
+function_call: symbol "(" [expression ("," expression)*] ")"
+
+?level8: level9
+    | addition
+    | substraction
+addition: level8 "+" level9
+substraction: level8 "-" level9
+
+?level9: level10
+    | multiplication
+    | division
+multiplication: level9 "*" level10
+division: level9 "/" level10
+
+?level10: term
+    | power
+power: level10 "^" term
+
+?term: number
+    | symbol
+    | priority
+?priority: "(" expression ")"
+
+
+
+
+
+type: WORD
+number: NUMBER
+symbol: WORD
+new_symbol: WORD
+
+
+
+
+

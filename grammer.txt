@@ -1,56 +1,16 @@
-?program: [(statement)+]
-
-?statement: declare_with_value
-    | declare_with_type
-    | assignment
-    | expression
-
-declare_with_type: "var" new_symbol ":" type
-declare_with_value: "var" new_symbol "=" expression
-assignment: symbol "=" expression
+?program: _NL* tree
 
 
-?expression: level8
-    | function_call
-function_call: symbol "(" [expression ("," expression)*] ")"
 
-?level8: level9
-    | addition
-    | substraction
-addition: level8 "+" level9
-substraction: level8 "-" level9
-
-?level9: level10
-    | multiplication
-    | division
-multiplication: level9 "*" level10
-division: level9 "/" level10
-
-?level10: term
-    | power
-power: level10 "^" term
-
-?term: number
-    | symbol
-    | priority
-?priority: "(" expression ")"
+?tree: NAME _NL [_INDENT tree+ _DEDENT]
 
 
 
 
-
-type: WORD
-number: NUMBER
-symbol: WORD
-new_symbol: WORD
-
-
-
-
-
-
+%import common.CNAME -> NAME
 %import common.WORD
 %import common.NUMBER
-%import common.WS
-%ignore WS
+%import common.WS_INLINE
+%ignore WS_INLINE
 %declare _INDENT _DEDENT
+_NL: /(\r?\n[\t ]*)+/
