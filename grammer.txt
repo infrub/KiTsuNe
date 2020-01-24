@@ -1,0 +1,16 @@
+?program: [(state)+]
+
+?state: declaration
+
+declaration: "var " new_symbol " "* "=" " "* term
+
+?term: fact
+
+?fact: number
+
+number: SIGNED_NUMBER
+
+new_symbol: WORD
+
+%import common.WORD
+%import common.SIGNED_NUMBER

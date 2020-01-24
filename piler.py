@@ -1,7 +1,12 @@
-def exec_tnk(src):
-    print(src)
+from lark import Lark
 
 
+program = open('source01.tnk').read()
+rule = open('grammer.txt').read()
 
-src = open("source01.tnk").read()
-exec_tnk(src)
+
+parser = Lark(rule, start='program', parser='lalr')
+tree = parser.parse(program)
+
+
+print(tree)
