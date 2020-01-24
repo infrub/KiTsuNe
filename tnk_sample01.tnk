@@ -4,3 +4,6 @@ def f(x):
         if i % 3 == 0:
             print(i)
     return x
+
+b = (3,4,5+2*3)
+print(b[0])
