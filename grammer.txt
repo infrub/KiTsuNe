@@ -3,13 +3,16 @@
 ?statement: declare_with_value
     | declare_with_type
     | assignment
+    | expression
 
-declare_with_value: "var" new_symbol "=" expression
 declare_with_type: "var" new_symbol ":" type
+declare_with_value: "var" new_symbol "=" expression
 assignment: symbol "=" expression
 
 
 ?expression: level8
+    | function_call
+function_call: symbol "(" [expression ("," expression)*] ")"
 
 ?level8: level9
     | addition
@@ -37,7 +40,7 @@ power: level10 "^" term
 
 
 type: WORD
-number: SIGNED_NUMBER
+number: NUMBER
 symbol: WORD
 new_symbol: WORD
 
@@ -47,7 +50,7 @@ new_symbol: WORD
 
 
 %import common.WORD
-%import common.SIGNED_NUMBER
+%import common.NUMBER
 %import common.WS
 %ignore WS
 %declare _INDENT _DEDENT
