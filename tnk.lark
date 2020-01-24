@@ -2,10 +2,6 @@ single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
 eval_input: testlist _NEWLINE*
 
-decorator: "@" dotted_name [ "(" [arguments] ")" ] _NEWLINE
-decorators: decorator+
-decorated: decorators (classdef | funcdef | async_funcdef)
-
 async_funcdef: "async" funcdef
 funcdef: "def" NAME "(" parameters? ")" ["->" test] ":" suite
 
@@ -55,7 +51,7 @@ global_stmt: "global" NAME ("," NAME)*
 nonlocal_stmt: "nonlocal" NAME ("," NAME)*
 assert_stmt: "assert" test ["," test]
 
-compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | decorated | async_stmt
+compound_stmt: if_stmt | while_stmt | for_stmt | try_stmt | with_stmt | funcdef | classdef | async_stmt
 async_stmt: "async" (funcdef | with_stmt | for_stmt)
 if_stmt: "if" test ":" suite ("elif" test ":" suite)* ["else" ":" suite]
 while_stmt: "while" test ":" suite ["else" ":" suite]
