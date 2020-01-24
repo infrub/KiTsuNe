@@ -80,9 +80,7 @@ star_expr: "*" expr
 !_mul_op: "*"|"@"|"/"|"%"|"//"
 !_comp_op: "<"|">"|"=="|">="|"<="|"<>"|"!="|"in"|"not" "in"|"is"|"is" "not"
 
-?power: await_expr ("**" factor)?
-?await_expr: AWAIT? atom_expr
-AWAIT: "await"
+?power: atom_expr ("**" factor)?
 
 ?atom_expr: atom_expr "(" [arguments] ")"    -> funccall
           | atom_expr "[" subscriptlist "]"  -> getitem
