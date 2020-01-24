@@ -1,15 +1,15 @@
 single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
-eval_input: testlist _NEWLINE*
+eval_input: korenani_list _NEWLINE*
 
-funcdef: "def" NAME "(" parameters? ")" ["->" test] ":" suite
+funcdef: "def" NAME "(" parameters? ")" ["->" ikisugiii] ":" suite
 
 parameters: paramvalue ("," paramvalue)*
-?paramvalue: typedparam ["=" test]
-?typedparam: NAME [":" test]
+?paramvalue: typedparam ["=" ikisugiii]
+?typedparam: NAME [":" ikisugiii]
 
-varargslist: (vfpdef ["=" test] ("," vfpdef ["=" test])* ["," [ "*" [vfpdef] ("," vfpdef ["=" test])* ["," ["**" vfpdef [","]]] | "**" vfpdef [","]]]
-  | "*" [vfpdef] ("," vfpdef ["=" test])* ["," ["**" vfpdef [","]]]
+varargslist: (vfpdef ["=" ikisugiii] ("," vfpdef ["=" ikisugiii])* ["," [ "*" [vfpdef] ("," vfpdef ["=" ikisugiii])* ["," ["**" vfpdef [","]]] | "**" vfpdef [","]]]
+  | "*" [vfpdef] ("," vfpdef ["=" ikisugiii])* ["," ["**" vfpdef [","]]]
   | "**" vfpdef [","])
 
 vfpdef: NAME
@@ -17,10 +17,10 @@ vfpdef: NAME
 ?stmt: simple_stmt | compound_stmt
 ?simple_stmt: small_stmt (";" small_stmt)* [";"] _NEWLINE
 ?small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
-?expr_stmt: testlist_star_expr (annassign | augassign testlist
-         | ("=" testlist_star_expr)*)
-annassign: ":" test ["=" test]
-?testlist_star_expr: (test|star_expr) ("," (test|star_expr))* [","]
+?expr_stmt: korenani_list_star_expr (annassign | augassign korenani_list
+         | ("=" korenani_list_star_expr)*)
+annassign: ":" ikisugiii ["=" ikisugiii]
+?korenani_list_star_expr: (ikisugiii|star_expr) ("," (ikisugiii|star_expr))* [","]
 !augassign: ("+=" | "-=" | "*=" | "@=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//=")
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: "del" exprlist
@@ -28,7 +28,7 @@ pass_stmt: "pass"
 ?flow_stmt: break_stmt | continue_stmt | return_stmt
 break_stmt: "break"
 continue_stmt: "continue"
-return_stmt: "return" [testlist]
+return_stmt: "return" [korenani_list]
 import_stmt: import_name | import_from
 import_name: "import" dotted_as_names
 
@@ -41,16 +41,68 @@ dotted_as_names: dotted_as_name ("," dotted_as_name)*
 dotted_name: NAME ("." NAME)*
 global_stmt: "global" NAME ("," NAME)*
 nonlocal_stmt: "nonlocal" NAME ("," NAME)*
-assert_stmt: "assert" test ["," test]
+assert_stmt: "assert" ikisugiii ["," ikisugiii]
 
 compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
-if_stmt: "if" test ":" suite ("elif" test ":" suite)* ["else" ":" suite]
-while_stmt: "while" test ":" suite ["else" ":" suite]
-for_stmt: "for" exprlist "in" testlist ":" suite ["else" ":" suite]
+if_stmt: "if" ikisugiii ":" suite ("elif" ikisugiii ":" suite)* ["else" ":" suite]
+while_stmt: "while" ikisugiii ":" suite ["else" ":" suite]
+for_stmt: "for" exprlist "in" korenani_list ":" suite ["else" ":" suite]
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
-?test: or_expr ("if" or_expr "else" test)?
-?test_nocond: or_expr
+
+
+
+
+
+?korenani_list_comp: (ikisugiii|star_expr) [comp_for | ("," (ikisugiii|star_expr))+ [","] | ","]
+subscriptlist: subscript ("," subscript)* [","]
+subscript: ikisugiii | [ikisugiii] ":" [ikisugiii] [sliceop]
+sliceop: ":" [ikisugiii]
+exprlist: (addsub_expr|star_expr) ("," (addsub_expr|star_expr))* [","]
+korenani_list: ikisugiii ("," ikisugiii)* [","]
+dictorsetmaker: ( ((ikisugiii ":" ikisugiii | "**" addsub_expr) (comp_for | ("," (ikisugiii ":" ikisugiii | "**" addsub_expr))* [","])) | ((ikisugiii | star_expr) (comp_for | ("," (ikisugiii | star_expr))* [","])) )
+
+classdef: "class" NAME ["(" [arguments] ")"] ":" suite
+
+arguments: argvalue ("," argvalue)* 
+         | ikisugiii comp_for
+
+?argvalue: ikisugiii ("=" ikisugiii)?
+
+
+
+comp_iter: comp_for | comp_if
+comp_for: "for" exprlist "in" or_expr [comp_iter]
+comp_if: "if" torima_nocond [comp_iter]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// wakaran
+// wakatta
+
+
+
+
+?ikisugiii: or_expr ("if" or_expr "else" ikisugiii)?
+?torima_nocond: or_expr
 ?or_expr: xor_expr ("or" xor_expr)*
 ?xor_expr: and_expr ("xor" and_expr)*
 ?and_expr: not_expr ("and" not_expr)*
@@ -75,41 +127,19 @@ star_expr: "*" addsub_expr
           | atom_expr "." NAME               -> getattr
           | atom
 
-?atom: "(" [testlist_comp] ")" -> tuple
-     | "[" [testlist_comp] "]"  -> list
+?atom: "(" [korenani_list_comp] ")" -> tuple
+     | "[" [korenani_list_comp] "]"  -> list
      | "{" [dictorsetmaker] "}" -> dict
      | NAME -> var
      | number | string+
-     | "(" test ")"
+     | "(" ikisugiii ")"
      | "..." -> ellipsis
      | "None"    -> const_none
      | "True"    -> const_true
      | "False"   -> const_false
 
-?testlist_comp: (test|star_expr) [comp_for | ("," (test|star_expr))+ [","] | ","]
-subscriptlist: subscript ("," subscript)* [","]
-subscript: test | [test] ":" [test] [sliceop]
-sliceop: ":" [test]
-exprlist: (addsub_expr|star_expr) ("," (addsub_expr|star_expr))* [","]
-testlist: test ("," test)* [","]
-dictorsetmaker: ( ((test ":" test | "**" addsub_expr) (comp_for | ("," (test ":" test | "**" addsub_expr))* [","])) | ((test | star_expr) (comp_for | ("," (test | star_expr))* [","])) )
 
-classdef: "class" NAME ["(" [arguments] ")"] ":" suite
-
-arguments: argvalue ("," argvalue)* 
-         | test comp_for
-
-?argvalue: test ("=" test)?
-
-
-
-comp_iter: comp_for | comp_if
-comp_for: "for" exprlist "in" or_expr [comp_iter]
-comp_if: "if" test_nocond [comp_iter]
-
-// not used in grammar, but may appear in "node" passed from Parser to Compiler
-encoding_decl: NAME
-
+encoding_decl: NAME // omajinai
 
 
 number: DEC_NUMBER | HEX_NUMBER | BIN_NUMBER | OCT_NUMBER | FLOAT_NUMBER | IMAG_NUMBER
