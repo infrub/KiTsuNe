@@ -12,3 +12,6 @@ print(b[0])
 def funi():
     while True:
         print("funi~")
+
+
+1+3*5>=2 or a*7 is True and c!=1
