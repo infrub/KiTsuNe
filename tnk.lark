@@ -52,8 +52,6 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" test ":" suite ("elif" test ":" suite)* ["else" ":" suite]
 while_stmt: "while" test ":" suite ["else" ":" suite]
 for_stmt: "for" exprlist "in" testlist ":" suite ["else" ":" suite]
-// NB compile.c makes sure that the default except clause is last
-except_clause: "except" [test ["as" NAME]]
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 ?test: or_test ("if" or_test "else" test)? | lambdef
@@ -108,13 +106,8 @@ dictorsetmaker: ( ((test ":" test | "**" expr) (comp_for | ("," (test ":" test |
 
 classdef: "class" NAME ["(" [arguments] ")"] ":" suite
 
-arguments: argvalue ("," argvalue)*  ("," [ starargs | kwargs])?
-         | starargs
-         | kwargs
+arguments: argvalue ("," argvalue)* 
          | test comp_for
-
-starargs: "*" test ("," "*" test)* ("," argvalue)* ["," kwargs]
-kwargs: "**" test
 
 ?argvalue: test ("=" test)?
 
