@@ -36,7 +36,7 @@ continue_stmt: "continue"
 return_stmt: "return" [testlist]
 import_stmt: import_name | import_from
 import_name: "import" dotted_as_names
-// note below: the ("." | "...") is necessary because "..." is tokenized as ELLIPSIS
+
 import_from: "from" (dots? dotted_name | dots) "import" ("*" | "(" import_as_names ")" | import_as_names)
 !dots: "."+
 import_as_name: NAME ["as" NAME]
@@ -54,10 +54,8 @@ while_stmt: "while" test ":" suite ["else" ":" suite]
 for_stmt: "for" exprlist "in" testlist ":" suite ["else" ":" suite]
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
-?test: or_test ("if" or_test "else" test)? | lambdef
-?test_nocond: or_test | lambdef_nocond
-lambdef: "lambda" [varargslist] ":" test
-lambdef_nocond: "lambda" [varargslist] ":" test_nocond
+?test: or_test ("if" or_test "else" test)?
+?test_nocond: or_test
 ?or_test: and_test ("or" and_test)*
 ?and_test: not_test ("and" not_test)*
 ?not_test: "not" not_test -> not
