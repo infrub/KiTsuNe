@@ -59,12 +59,12 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 ?comparison_expr: addsub_expr (_comp_op addsub_expr)*
 star_expr: "*" addsub_expr
 ?addsub_expr: muldiv_expr (_addsub_op muldiv_expr)*
-?muldiv_expr: factor (_muldiv_op factor)*
-?factor: _prefix_op factor | power_expr
-?power_expr: atom_expr ("**" factor)?
+?muldiv_expr: prefix_expr (_muldiv_op prefix_expr)*
+?prefix_expr: _prefix_op prefix_expr
+            | power_expr
+?power_expr: atom_expr ("^" prefix_expr)?
 
 !_prefix_op: "+"|"-"|"~"
-!_power_op: "^"
 !_muldiv_op: "*"|"@"|"/"|"%"|"//"
 !_addsub_op: "+"|"-"
 !_comp_op: "<"|">"|"=="|">="|"<="|"<>"|"!="|"in"|"notin"|"is"|"isnot"
