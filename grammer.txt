@@ -1,16 +1,53 @@
-?program: [(state)+]
+?program: [(statement)+]
 
-?state: declaration
+?statement: declare_with_value
+    | declare_with_type
+    | assignment
 
-declaration: "var " new_symbol " "* "=" " "* term
+declare_with_value: "var" new_symbol "=" expression
+declare_with_type: "var" new_symbol ":" type
+assignment: symbol "=" expression
 
-?term: fact
 
-?fact: number
+?expression: level8
 
+?level8: level9
+    | addition
+    | substraction
+addition: level8 "+" level9
+substraction: level8 "-" level9
+
+?level9: level10
+    | multiplication
+    | division
+multiplication: level9 "*" level10
+division: level9 "/" level10
+
+?level10: term
+    | power
+power: level10 "^" term
+
+?term: number
+    | symbol
+    | priority
+?priority: "(" expression ")"
+
+
+
+
+
+type: WORD
 number: SIGNED_NUMBER
-
+symbol: WORD
 new_symbol: WORD
+
+
+
+
+
 
 %import common.WORD
 %import common.SIGNED_NUMBER
+%import common.WS
+%ignore WS
+%declare _INDENT _DEDENT
