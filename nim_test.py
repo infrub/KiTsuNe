@@ -11,12 +11,15 @@ class PythonIndenter(Indenter):
 
 kwargs = dict(rel_to=__file__, postlex=PythonIndenter(), start='file_input')
 
-python_parser3 = Lark.open('py3.lark',parser='lalr', **kwargs)
+python_parser3 = Lark.open('nim.lark',parser='lalr', **kwargs)
 
 
-program = open("py3_sample.py", **{'encoding': 'iso-8859-1'}).read() +"\n"
+program = open("nim_sample.nim", **{'encoding': 'iso-8859-1'}).read() +"\n"
 tree = python_parser3.parse(program)
 
 
 print(tree)
 print(tree.pretty())
+
+
+#doesnt work
