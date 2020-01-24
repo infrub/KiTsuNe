@@ -1,5 +1,6 @@
 a = 1
 def f(x):
-    return x*a
-
-f(2)
+    for i in range(x):
+        if i % 3 == 0:
+            print(i)
+    return x
