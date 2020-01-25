@@ -1,6 +1,6 @@
 single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
-eval_input: korenani_list _NEWLINE*
+eval_input: rekkyo _NEWLINE*
 
 funcdef: "def" NAME "(" parameters? ")" ["->" level2_expr] ":" suite
 
@@ -17,7 +17,7 @@ vfpdef: NAME
 ?stmt: simple_stmt | compound_stmt
 ?simple_stmt: small_stmt (";" small_stmt)* [";"] _NEWLINE
 ?small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
-?expr_stmt: korenani_list_star_expr (annassign | augassign korenani_list
+?expr_stmt: korenani_list_star_expr (annassign | augassign rekkyo
          | ("=" korenani_list_star_expr)*)
 annassign: ":" level2_expr ["=" level2_expr]
 ?korenani_list_star_expr: (level2_expr|star_expr) ("," (level2_expr|star_expr))* [","]
@@ -28,7 +28,7 @@ pass_stmt: "pass"
 ?flow_stmt: break_stmt | continue_stmt | return_stmt
 break_stmt: "break"
 continue_stmt: "continue"
-return_stmt: "return" [korenani_list]
+return_stmt: "return" [rekkyo]
 import_stmt: import_name | import_from
 import_name: "import" dotted_as_names
 
@@ -43,37 +43,23 @@ global_stmt: "global" NAME ("," NAME)*
 nonlocal_stmt: "nonlocal" NAME ("," NAME)*
 assert_stmt: "assert" level2_expr ["," level2_expr]
 
-compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
-if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
-while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
-for_stmt: "for" exprlist "in" korenani_list ":" suite ["else" ":" suite]
-suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 
 
 
 
 
-?korenani_list_comp: (level2_expr|star_expr) [comp_for | ("," (level2_expr|star_expr))+ [","] | ","]
+?korenani_list_comp: (level2_expr|star_expr) [("," (level2_expr|star_expr))+ [","] | ","]
 subscriptlist: subscript ("," subscript)* [","]
 subscript: level2_expr | [level2_expr] ":" [level2_expr] [sliceop]
 sliceop: ":" [level2_expr]
 exprlist: (addsub_expr|star_expr) ("," (addsub_expr|star_expr))* [","]
-korenani_list: level2_expr ("," level2_expr)* [","]
 
 classdef: "class" NAME ["(" [arguments] ")"] ":" suite
 
 arguments: argvalue ("," argvalue)* 
-         | level2_expr comp_for
 
 ?argvalue: level2_expr ("=" level2_expr)?
-
-
-
-comp_iter: comp_for | comp_if
-comp_for: "for" exprlist "in" or_expr [comp_iter]
-comp_if: "if" level3_expr [comp_iter]
-
 
 
 
@@ -96,6 +82,22 @@ comp_if: "if" level3_expr [comp_iter]
 
 // wakaran
 // wakatta
+
+
+
+
+
+compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
+if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
+while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
+for_stmt: "for" exprlist "in" rekkyo ":" suite ["else" ":" suite]
+suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
+
+
+
+
+rekkyo: level2_expr ("," level2_expr)* [","]
+
 
 
 
