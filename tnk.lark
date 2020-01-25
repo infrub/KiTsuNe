@@ -2,14 +2,14 @@ single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
 eval_input: korenani_list _NEWLINE*
 
-funcdef: "def" NAME "(" parameters? ")" ["->" ikisugiii] ":" suite
+funcdef: "def" NAME "(" parameters? ")" ["->" level2_expr] ":" suite
 
 parameters: paramvalue ("," paramvalue)*
-?paramvalue: typedparam ["=" ikisugiii]
-?typedparam: NAME [":" ikisugiii]
+?paramvalue: typedparam ["=" level2_expr]
+?typedparam: NAME [":" level2_expr]
 
-varargslist: (vfpdef ["=" ikisugiii] ("," vfpdef ["=" ikisugiii])* ["," [ "*" [vfpdef] ("," vfpdef ["=" ikisugiii])* ["," ["**" vfpdef [","]]] | "**" vfpdef [","]]]
-  | "*" [vfpdef] ("," vfpdef ["=" ikisugiii])* ["," ["**" vfpdef [","]]]
+varargslist: (vfpdef ["=" level2_expr] ("," vfpdef ["=" level2_expr])* ["," [ "*" [vfpdef] ("," vfpdef ["=" level2_expr])* ["," ["**" vfpdef [","]]] | "**" vfpdef [","]]]
+  | "*" [vfpdef] ("," vfpdef ["=" level2_expr])* ["," ["**" vfpdef [","]]]
   | "**" vfpdef [","])
 
 vfpdef: NAME
@@ -19,8 +19,8 @@ vfpdef: NAME
 ?small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
 ?expr_stmt: korenani_list_star_expr (annassign | augassign korenani_list
          | ("=" korenani_list_star_expr)*)
-annassign: ":" ikisugiii ["=" ikisugiii]
-?korenani_list_star_expr: (ikisugiii|star_expr) ("," (ikisugiii|star_expr))* [","]
+annassign: ":" level2_expr ["=" level2_expr]
+?korenani_list_star_expr: (level2_expr|star_expr) ("," (level2_expr|star_expr))* [","]
 !augassign: ("+=" | "-=" | "*=" | "@=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//=")
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: "del" exprlist
@@ -41,11 +41,11 @@ dotted_as_names: dotted_as_name ("," dotted_as_name)*
 dotted_name: NAME ("." NAME)*
 global_stmt: "global" NAME ("," NAME)*
 nonlocal_stmt: "nonlocal" NAME ("," NAME)*
-assert_stmt: "assert" ikisugiii ["," ikisugiii]
+assert_stmt: "assert" level2_expr ["," level2_expr]
 
 compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
-if_stmt: "if" ikisugiii ":" suite ("elif" ikisugiii ":" suite)* ["else" ":" suite]
-while_stmt: "while" ikisugiii ":" suite ["else" ":" suite]
+if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
+while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
 for_stmt: "for" exprlist "in" korenani_list ":" suite ["else" ":" suite]
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
@@ -54,26 +54,25 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 
 
-?korenani_list_comp: (ikisugiii|star_expr) [comp_for | ("," (ikisugiii|star_expr))+ [","] | ","]
+?korenani_list_comp: (level2_expr|star_expr) [comp_for | ("," (level2_expr|star_expr))+ [","] | ","]
 subscriptlist: subscript ("," subscript)* [","]
-subscript: ikisugiii | [ikisugiii] ":" [ikisugiii] [sliceop]
-sliceop: ":" [ikisugiii]
+subscript: level2_expr | [level2_expr] ":" [level2_expr] [sliceop]
+sliceop: ":" [level2_expr]
 exprlist: (addsub_expr|star_expr) ("," (addsub_expr|star_expr))* [","]
-korenani_list: ikisugiii ("," ikisugiii)* [","]
-dictorsetmaker: ( ((ikisugiii ":" ikisugiii | "**" addsub_expr) (comp_for | ("," (ikisugiii ":" ikisugiii | "**" addsub_expr))* [","])) | ((ikisugiii | star_expr) (comp_for | ("," (ikisugiii | star_expr))* [","])) )
+korenani_list: level2_expr ("," level2_expr)* [","]
 
 classdef: "class" NAME ["(" [arguments] ")"] ":" suite
 
 arguments: argvalue ("," argvalue)* 
-         | ikisugiii comp_for
+         | level2_expr comp_for
 
-?argvalue: ikisugiii ("=" ikisugiii)?
+?argvalue: level2_expr ("=" level2_expr)?
 
 
 
 comp_iter: comp_for | comp_if
 comp_for: "for" exprlist "in" or_expr [comp_iter]
-comp_if: "if" torima_nocond [comp_iter]
+comp_if: "if" level3_expr [comp_iter]
 
 
 
@@ -101,8 +100,8 @@ comp_if: "if" torima_nocond [comp_iter]
 
 
 
-?ikisugiii: or_expr ("if" or_expr "else" ikisugiii)?
-?torima_nocond: or_expr
+?level2_expr: or_expr ("if" or_expr "else" level2_expr)?
+?level3_expr: or_expr
 ?or_expr: xor_expr ("or" xor_expr)*
 ?xor_expr: and_expr ("xor" and_expr)*
 ?and_expr: not_expr ("and" not_expr)*
@@ -129,17 +128,25 @@ star_expr: "*" addsub_expr
 
 ?atom: "(" [korenani_list_comp] ")" -> tuple
      | "[" [korenani_list_comp] "]"  -> list
-     | "{" [dictorsetmaker] "}" -> dict
      | NAME -> var
      | number | string+
-     | "(" ikisugiii ")"
+     | "(" level2_expr ")"
      | "..." -> ellipsis
      | "None"    -> const_none
      | "True"    -> const_true
      | "False"   -> const_false
 
 
+
+
+
+
 encoding_decl: NAME // omajinai
+
+
+
+
+
 
 
 number: DEC_NUMBER | HEX_NUMBER | BIN_NUMBER | OCT_NUMBER | FLOAT_NUMBER | IMAG_NUMBER
