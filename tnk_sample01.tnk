@@ -1,6 +1,6 @@
-a = 1
-def f(x):
-    for i in range(x):
+var a = 1
+proc f(x:int,y:int=10):int=
+    for i in range(x,y):
         if i % 3 == 0:
             print(i)
     return x
@@ -9,7 +9,7 @@ b = (3,4,5+2*3)
 print(b[0])
 
 
-def funi():
+proc funi()=
     while True:
         print("funi~")
 

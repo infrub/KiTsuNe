@@ -7,7 +7,7 @@ eval_input: rekkyo _NEWLINE*
 // statements
 ?stmt: simple_stmt | compound_stmt
 ?simple_stmt: small_stmt (";" small_stmt)* [";"] _NEWLINE
-?small_stmt: (expr_stmt | pass_stmt | flow_stmt | import_stmt)
+?small_stmt: (normal_stmt | flow_stmt | import_stmt)
 
 
 
@@ -29,7 +29,7 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
 for_stmt: "for" exprlist "in" rekkyo ":" suite ["else" ":" suite]
-funcdef: "def" NAME "(" parameters? ")" ["->" level2_expr] ":" suite
+funcdef: "proc" NAME "(" parameters? ")" [":" type] "=" suite
 classdef: "class" NAME ["(" [arguments] ")"] ":" suite
 
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
@@ -37,20 +37,27 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 
 // control statements
+?flow_stmt: pass_stmt | break_stmt | continue_stmt | return_stmt
 pass_stmt: "pass"
-?flow_stmt: break_stmt | continue_stmt | return_stmt
 break_stmt: "break"
 continue_stmt: "continue"
 return_stmt: "return" [rekkyo]
 
 
 
-// other statements
-?expr_stmt: rekkyo (annassign
-                   |augassign rekkyo
-                   |("=" rekkyo)*)
-annassign: ":" level2_expr ["=" level2_expr]
-!augassign: ("+=" | "-=" | "*=" | "@=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//=")
+// normal statements
+?normal_stmt: declare_with_type_stmt
+            | declare_with_value_stmt
+            | declare_with_type_and_value_stmt
+            | assign_stmt
+            | just_expr_stmt
+
+declare_with_type_stmt: "var" symbol ":" type
+declare_with_value_stmt: "var" symbol "=" level2_expr
+declare_with_type_and_value_stmt: "var" symbol ":" type "=" level2_expr
+assign_stmt: rekkyo "=" level2_expr
+just_expr_stmt: level2_expr
+
 
 
 
@@ -81,8 +88,9 @@ annassign: ":" level2_expr ["=" level2_expr]
 
 ?atom: "(" [rekkyo] ")" -> tuple
      | "[" [rekkyo] "]"  -> list
-     | NAME -> var
-     | number | string+
+     | symbol
+     | number
+     | string+
      | "(" level2_expr ")"
      | "..." -> ellipsis
      | "None"    -> const_none
@@ -92,9 +100,8 @@ annassign: ":" level2_expr ["=" level2_expr]
 
 
 // iterative
-parameters: paramvalue ("," paramvalue)*
-?paramvalue: typedparam ["=" level2_expr]
-?typedparam: NAME [":" level2_expr]
+parameters: param ("," param)*
+?param: symbol ":" type ["=" level2_expr]
 
 exprlist: addsub_expr ("," addsub_expr)* [","]
 arguments: argvalue ("," argvalue)* 
@@ -105,6 +112,11 @@ rekkyo: level2_expr ("," level2_expr)* [","]
 
 // omajinai
 encoding_decl: NAME
+
+
+
+symbol: NAME
+type: NAME
 
 
 
