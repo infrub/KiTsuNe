@@ -2,11 +2,6 @@ single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
 eval_input: rekkyo _NEWLINE*
 
-funcdef: "def" NAME "(" parameters? ")" ["->" level2_expr] ":" suite
-
-parameters: paramvalue ("," paramvalue)*
-?paramvalue: typedparam ["=" level2_expr]
-?typedparam: NAME [":" level2_expr]
 
 varargslist: (vfpdef ["=" level2_expr] ("," vfpdef ["=" level2_expr])* ["," [ "*" [vfpdef] ("," vfpdef ["=" level2_expr])* ["," ["**" vfpdef [","]]] | "**" vfpdef [","]]]
   | "*" [vfpdef] ("," vfpdef ["=" level2_expr])* ["," ["**" vfpdef [","]]]
@@ -20,7 +15,7 @@ vfpdef: NAME
 ?expr_stmt: korenani_list_star_expr (annassign | augassign rekkyo
          | ("=" korenani_list_star_expr)*)
 annassign: ":" level2_expr ["=" level2_expr]
-?korenani_list_star_expr: (level2_expr|star_expr) ("," (level2_expr|star_expr))* [","]
+?korenani_list_star_expr: level2_expr ("," level2_expr)* [","]
 !augassign: ("+=" | "-=" | "*=" | "@=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//=")
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: "del" exprlist
@@ -49,24 +44,11 @@ assert_stmt: "assert" level2_expr ["," level2_expr]
 
 
 
-?korenani_list_comp: (level2_expr|star_expr) [("," (level2_expr|star_expr))+ [","] | ","]
+?korenani_list_comp: level2_expr [("," level2_expr)+ [","] | ","]
 subscriptlist: subscript ("," subscript)* [","]
 subscript: level2_expr | [level2_expr] ":" [level2_expr] [sliceop]
 sliceop: ":" [level2_expr]
-exprlist: (addsub_expr|star_expr) ("," (addsub_expr|star_expr))* [","]
-
-classdef: "class" NAME ["(" [arguments] ")"] ":" suite
-
-arguments: argvalue ("," argvalue)* 
-
-?argvalue: level2_expr ("=" level2_expr)?
-
-
-
-
-
-
-
+exprlist: addsub_expr ("," addsub_expr)* [","]
 
 
 
@@ -91,8 +73,11 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
 for_stmt: "for" exprlist "in" rekkyo ":" suite ["else" ":" suite]
-suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
+funcdef: "def" NAME "(" parameters? ")" ["->" level2_expr] ":" suite
+classdef: "class" NAME ["(" [arguments] ")"] ":" suite
 
+
+suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 
 
@@ -110,7 +95,6 @@ rekkyo: level2_expr ("," level2_expr)* [","]
 ?not_expr: "not" not_expr -> not
          | comparison_expr
 ?comparison_expr: addsub_expr (_comp_op addsub_expr)*
-star_expr: "*" addsub_expr
 ?addsub_expr: muldiv_expr (_addsub_op muldiv_expr)*
 ?muldiv_expr: prefix_expr (_muldiv_op prefix_expr)*
 ?prefix_expr: _prefix_op prefix_expr
@@ -138,6 +122,15 @@ star_expr: "*" addsub_expr
      | "True"    -> const_true
      | "False"   -> const_false
 
+
+
+
+parameters: paramvalue ("," paramvalue)*
+?paramvalue: typedparam ["=" level2_expr]
+?typedparam: NAME [":" level2_expr]
+
+arguments: argvalue ("," argvalue)* 
+?argvalue: level2_expr ("=" level2_expr)?
 
 
 
