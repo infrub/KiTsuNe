@@ -44,10 +44,6 @@ assert_stmt: "assert" level2_expr ["," level2_expr]
 
 
 
-subscriptlist: subscript ("," subscript)* [","]
-subscript: level2_expr | [level2_expr] ":" [level2_expr] [sliceop]
-sliceop: ":" [level2_expr]
-exprlist: addsub_expr ("," addsub_expr)* [","]
 
 
 
@@ -80,7 +76,6 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
 
 
-rekkyo: level2_expr ("," level2_expr)* [","]
 
 
 
@@ -107,7 +102,7 @@ rekkyo: level2_expr ("," level2_expr)* [","]
 
 
 ?atom_expr: atom_expr "(" [arguments] ")"    -> funccall
-          | atom_expr "[" subscriptlist "]"  -> getitem
+          | atom_expr "[" rekkyo "]"  -> getitem
           | atom_expr "." NAME               -> getattr
           | atom
 
@@ -128,8 +123,10 @@ parameters: paramvalue ("," paramvalue)*
 ?paramvalue: typedparam ["=" level2_expr]
 ?typedparam: NAME [":" level2_expr]
 
+exprlist: addsub_expr ("," addsub_expr)* [","]
 arguments: argvalue ("," argvalue)* 
 ?argvalue: level2_expr ("=" level2_expr)?
+rekkyo: level2_expr ("," level2_expr)* [","]
 
 
 
