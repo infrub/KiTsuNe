@@ -12,10 +12,9 @@ vfpdef: NAME
 ?stmt: simple_stmt | compound_stmt
 ?simple_stmt: small_stmt (";" small_stmt)* [";"] _NEWLINE
 ?small_stmt: (expr_stmt | del_stmt | pass_stmt | flow_stmt | import_stmt | global_stmt | nonlocal_stmt | assert_stmt)
-?expr_stmt: korenani_list_star_expr (annassign | augassign rekkyo
-         | ("=" korenani_list_star_expr)*)
+?expr_stmt: rekkyo (annassign | augassign rekkyo
+         | ("=" rekkyo)*)
 annassign: ":" level2_expr ["=" level2_expr]
-?korenani_list_star_expr: level2_expr ("," level2_expr)* [","]
 !augassign: ("+=" | "-=" | "*=" | "@=" | "/=" | "%=" | "&=" | "|=" | "^=" | "<<=" | ">>=" | "**=" | "//=")
 // For normal and annotated assignments, additional restrictions enforced by the interpreter
 del_stmt: "del" exprlist
@@ -44,7 +43,7 @@ assert_stmt: "assert" level2_expr ["," level2_expr]
 
 
 
-?korenani_list_comp: level2_expr [("," level2_expr)+ [","] | ","]
+
 subscriptlist: subscript ("," subscript)* [","]
 subscript: level2_expr | [level2_expr] ":" [level2_expr] [sliceop]
 sliceop: ":" [level2_expr]
@@ -112,8 +111,8 @@ rekkyo: level2_expr ("," level2_expr)* [","]
           | atom_expr "." NAME               -> getattr
           | atom
 
-?atom: "(" [korenani_list_comp] ")" -> tuple
-     | "[" [korenani_list_comp] "]"  -> list
+?atom: "(" [rekkyo] ")" -> tuple
+     | "[" [rekkyo] "]"  -> list
      | NAME -> var
      | number | string+
      | "(" level2_expr ")"
