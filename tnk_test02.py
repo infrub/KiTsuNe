@@ -25,6 +25,12 @@ print(tree.pretty())
 
 
 
+class Variable:
+    def __init__(self, key, taipu, value):
+        self.key = key
+        self.
+
+
 class Environment():
     def __init__(self, parent_env):
         self._parent_env = parent_env

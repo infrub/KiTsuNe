@@ -26,11 +26,11 @@ dotted_name: NAME ("." NAME)*
 
 // compund statements
 compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
-if_stmt: "if" level2_expr ":" suite ("elif" level2_expr ":" suite)* ["else" ":" suite]
-while_stmt: "while" level2_expr ":" suite ["else" ":" suite]
-for_stmt: "for" exprlist "in" rekkyo ":" suite ["else" ":" suite]
-funcdef: "proc" NAME "(" parameters? ")" [":" type] "=" suite
-classdef: "class" NAME ["(" [arguments] ")"] ":" suite
+if_stmt: "if" right_expr ":" suite ("elif" right_expr ":" suite)* ["else" ":" suite]
+while_stmt: "while" right_expr ":" suite ["else" ":" suite]
+for_stmt: "for" symbol "in" rekkyo ":" suite ["else" ":" suite]
+funcdef: "proc" NAME "(" parameters ")" [":" type] "=" suite
+classdef: "class" NAME ":" suite
 
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
@@ -41,7 +41,7 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 pass_stmt: "pass"
 break_stmt: "break"
 continue_stmt: "continue"
-return_stmt: "return" [rekkyo]
+return_stmt: "return" [right_expr]
 
 
 
@@ -53,21 +53,26 @@ return_stmt: "return" [rekkyo]
             | just_expr_stmt
 
 declare_with_type_stmt: "var" left_expr ":" type
-declare_with_value_stmt: "var" left_expr "=" rekkyo
-declare_with_type_and_value_stmt: "var" left_expr ":" type "=" rekkyo
-assign_stmt: left_expr "=" rekkyo
-just_expr_stmt: level2_expr
+declare_with_value_stmt: "var" left_expr "=" right_expr
+declare_with_type_and_value_stmt: "var" left_expr ":" type "=" right_expr
+assign_stmt: left_expr "=" right_expr
+just_expr_stmt: right_expr
 
 
 
-left_expr: atom_expr ("," atom_expr)* [","]
+// left expressions
+left_expr: left_atom_expr
+
+?left_atom_expr: atom_expr "[" arguments "]"   -> setitem
+               | atom_expr "." NAME            -> setattr
+               | atom
+
+?left_atom: symbol
 
 
 
-
-// expressions
-?level2_expr: or_expr ("if" or_expr "else" level2_expr)?
-?level3_expr: or_expr
+// right expressions
+?right_expr: or_expr ("if" or_expr "else" right_expr)?
 ?or_expr: xor_expr ("or" xor_expr)*
 ?xor_expr: and_expr ("xor" and_expr)*
 ?and_expr: not_expr ("and" not_expr)*
@@ -85,9 +90,9 @@ left_expr: atom_expr ("," atom_expr)* [","]
 !_addsub_op: "+"|"-"
 !_comp_op: "<"|">"|"=="|">="|"<="|"<>"|"!="|"in"|"notin"|"is"|"isnot"
 
-?atom_expr: atom_expr "(" [arguments] ")"    -> funccall
-          | atom_expr "[" rekkyo "]"  -> getitem
-          | atom_expr "." NAME               -> getattr
+?atom_expr: atom_expr "(" arguments ")"  -> funccall
+          | atom_expr "[" arguments "]"  -> getitem
+          | atom_expr "." NAME           -> getattr
           | atom
 
 ?atom: "(" [rekkyo] ")" -> tuple
@@ -95,7 +100,7 @@ left_expr: atom_expr ("," atom_expr)* [","]
      | symbol
      | number
      | string+
-     | "(" level2_expr ")"
+     | "(" right_expr ")"
      | "..." -> ellipsis
      | "None"    -> const_none
      | "True"    -> const_true
@@ -104,13 +109,15 @@ left_expr: atom_expr ("," atom_expr)* [","]
 
 
 // iterative
-parameters: param ("," param)*
-?param: symbol ":" type ["=" level2_expr]
+parameters: [param ("," param)* [","]]
+?param: symbol ":" type ["=" right_expr]
 
-exprlist: addsub_expr ("," addsub_expr)* [","]
-arguments: argvalue ("," argvalue)* 
-?argvalue: level2_expr ("=" level2_expr)?
-rekkyo: level2_expr ("," level2_expr)* [","]
+arguments: [arg ("," arg)* [","]]
+?arg: named_arg | unnamed_arg
+named_arg: symbol "=" right_expr
+unnamed_arg: right_expr
+
+rekkyo: right_expr ("," right_expr)* [","]
 
 
 
@@ -119,13 +126,10 @@ encoding_decl: NAME
 
 
 
+// elements
 symbol: NAME
-new_symbol: NAME
 type: NAME
 
-
-
-// elements
 number: DEC_NUMBER | HEX_NUMBER | BIN_NUMBER | OCT_NUMBER | FLOAT_NUMBER | IMAG_NUMBER
 string: STRING | LONG_STRING
 
