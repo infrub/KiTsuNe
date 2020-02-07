@@ -54,11 +54,17 @@ class Visitor():
         f = getattr(self, tree.data)
         return f(tree, env)
 
-    def declare_with_value_stmt(self, tree, env):
-        key = self._visit(tree.children[0], env)
-        value = self._visit(tree.children[1], env)
+    def _declare_with_value(self, k, v, env):
+        key = k.children[0].value
+        value = self._visit(v, env)
         env.set(key, value)
 
+    def declare_with_value_stmt(self, tree, env):
+        for k,v in zip(tree.children[0].children, tree.children[1].children):
+            self._declare_with_value(k, v, env)
+
+
+    """
     def assign_stmt(self, tree, env):
         key = self._visit(tree.children[0], env)
         print(key)
@@ -81,7 +87,7 @@ class Visitor():
         if key in env:
             raise Exception("The symbol is already declared")
         return key
-    
+    """
     def symbol(self, tree, env):
         key = tree.children[0].value
         return env.get(key)

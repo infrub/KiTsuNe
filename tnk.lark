@@ -52,11 +52,15 @@ return_stmt: "return" [rekkyo]
             | assign_stmt
             | just_expr_stmt
 
-declare_with_type_stmt: "var" new_symbol ":" type
-declare_with_value_stmt: "var" new_symbol "=" level2_expr
-declare_with_type_and_value_stmt: "var" new_symbol ":" type "=" level2_expr
-assign_stmt: rekkyo "=" rekkyo
+declare_with_type_stmt: "var" left_expr ":" type
+declare_with_value_stmt: "var" left_expr "=" rekkyo
+declare_with_type_and_value_stmt: "var" left_expr ":" type "=" rekkyo
+assign_stmt: left_expr "=" rekkyo
 just_expr_stmt: level2_expr
+
+
+
+left_expr: atom_expr ("," atom_expr)* [","]
 
 
 
