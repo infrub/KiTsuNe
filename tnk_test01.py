@@ -20,6 +20,3 @@ tree = parser.parse(program)
 
 print(tree)
 print(tree.pretty())
-
-
-#doesnt work
