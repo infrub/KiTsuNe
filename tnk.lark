@@ -133,13 +133,13 @@ indices: "[" index_unit ("," index_unit)* [","] "]"
 ?index_unit: rs_expr
 
 pointer: "[" [pointer_unit ("," pointer_unit)* [","]] "]"
-?pointer_unit: label "=" rs_expr
+?pointer_unit: NAME "=" rs_expr
 
 replacer: "(" replacer_unit ("," replacer_unit)* [","] ")"
 ?replacer_unit: labels "->" labels
 
 matizer: "{" [matizer_unit ("," matizer_unit)* [","]] "}"
-?matizer_unit: label
+?matizer_unit: NAME
 
 
 
@@ -149,10 +149,9 @@ encoding_decl: NAME
 
 
 // elements
-labels: label
-      | "(" label ("," label)* ")"
+labels: NAME
+      | "(" NAME ("," NAME)* ")"
 
-label: NAME
 symbol: NAME
 type: NAME
 
