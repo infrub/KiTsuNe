@@ -29,7 +29,7 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" rs_expr ":" suite ("elif" rs_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" rs_expr ":" suite ["else" ":" suite]
 for_stmt: "for" symbol "in" rs_expr ":" suite ["else" ":" suite]
-funcdef: "proc" NAME "(" parameters ")" [":" type] "=" suite
+funcdef: "proc" NAME parameters [":" type] "=" suite
 classdef: "class" NAME ":" suite
 
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
@@ -63,7 +63,7 @@ just_expr_stmt: rs_expr
 
 
 // left-side expressions
-rekkyo_ls_expr: [ls_expr ("," ls_expr)* [","]]
+rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
 
 ?ls_expr: ls_atom_expr
 
@@ -82,17 +82,21 @@ rekkyo_ls_expr: [ls_expr ("," ls_expr)* [","]]
                            | ls_atom_expr_before_matize pointer       -> setpoint
                            | ls_atom
 
-?ls_atom: "(" rekkyo_ls_expr ")"  -> settuple
+?ls_atom: "(" ls_tuple_elements ")"  -> settuple
         | symbol
 
+ls_tuple_elements: ","
+                 | ls_atom_expr ","
+                 | ls_atom_expr ("," ls_atom_expr)+ ","?
 
 
 
 
 // right-side expressions
-rekkyo_rs_expr: [rs_expr ("," rs_expr)* [","]]
+rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
+?rs_expr: ternary_expr
 
-?rs_expr: or_expr ("if" or_expr "else" rs_expr)?
+?ternary_expr: or_expr ("if" or_expr "else" ternary_expr)?
 ?or_expr: xor_expr ("or" xor_expr)*
 ?xor_expr: and_expr ("xor" and_expr)*
 ?and_expr: not_expr ("and" not_expr)*
@@ -131,7 +135,7 @@ rekkyo_rs_expr: [rs_expr ("," rs_expr)* [","]]
                         | atom_expr_before_matize replacer      -> replace
                         | atom
 
-?atom: "(" rekkyo_rs_expr ")"  -> gettuple
+?atom: "(" tuple_elements ")"  -> gettuple
      | symbol
      | number
      | string+
@@ -140,8 +144,9 @@ rekkyo_rs_expr: [rs_expr ("," rs_expr)* [","]]
      | "True"    -> const_true
      | "False"   -> const_false
 
-
-
+tuple_elements: ","
+              | ternary_expr ","
+              | ternary_expr ("," ternary_expr)+ ","?
 
 
 
@@ -161,7 +166,7 @@ pointer: "[" [pointer_unit ("," pointer_unit)* [","]] "]"
 ?pointer_unit: label "=" rs_expr
 
 replacer: "(" replacer_unit ("," replacer_unit)* [","] ")"
-?replacer_unit: labels ">" labels
+?replacer_unit: labels "->" labels
 
 matizer: "{" [matizer_unit ("," matizer_unit)* [","]] "}"
 ?matizer_unit: label

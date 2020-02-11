@@ -1,7 +1,7 @@
 from lark import Lark
 from lark.indenter import Indenter
 
-class PythonIndenter(Indenter):
+class MyIndenter(Indenter):
     NL_type = '_NEWLINE'
     OPEN_PAREN_types = ['LPAR', 'LSQB', 'LBRACE']
     CLOSE_PAREN_types = ['RPAR', 'RSQB', 'RBRACE']
@@ -9,7 +9,7 @@ class PythonIndenter(Indenter):
     DEDENT_type = '_DEDENT'
     tab_len = 4
 
-kwargs = dict(rel_to=__file__, postlex=PythonIndenter(), start='file_input')
+kwargs = dict(rel_to=__file__, postlex=MyIndenter(), start='file_input')
 
 parser = Lark.open('tnk.lark',parser='earley', **kwargs)
 
