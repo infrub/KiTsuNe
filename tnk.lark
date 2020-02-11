@@ -132,7 +132,6 @@ rekkyo_rs_expr: [rs_expr ("," rs_expr)* [","]]
                         | atom
 
 ?atom: "(" rekkyo_rs_expr ")"  -> gettuple
-     | "[" rekkyo_rs_expr "]"  -> list
      | symbol
      | number
      | string+
@@ -177,12 +176,12 @@ encoding_decl: NAME
 // elements
 labels: label
       | "(" label ("," label)* ")"
-label: NAME
 
+label: NAME
 symbol: NAME
 type: NAME
 
-number: DEC_NUMBER | HEX_NUMBER | BIN_NUMBER | OCT_NUMBER | FLOAT_NUMBER | IMAG_NUMBER
+number: DEC_NUMBER
 string: STRING | LONG_STRING
 
 NAME: /[a-zA-Z_]\w*/
@@ -193,11 +192,6 @@ STRING : /[ubf]?r?("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i
 LONG_STRING: /[ubf]?r?(""".*?(?<!\\)(\\\\)*?"""|'''.*?(?<!\\)(\\\\)*?''')/is
 
 DEC_NUMBER: /0|[1-9]\d*/i
-HEX_NUMBER.2: /0x[\da-f]*/i
-OCT_NUMBER.2: /0o[0-7]*/i
-BIN_NUMBER.2 : /0b[0-1]*/i
-FLOAT_NUMBER.2: /((\d+\.\d*|\.\d+)(e[-+]?\d+)?|\d+(e[-+]?\d+))/i
-IMAG_NUMBER.2: /\d+j/i | FLOAT_NUMBER "j"i
 
 
 %ignore /[\t \f]+/  // WS

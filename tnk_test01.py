@@ -11,7 +11,7 @@ class PythonIndenter(Indenter):
 
 kwargs = dict(rel_to=__file__, postlex=PythonIndenter(), start='file_input')
 
-parser = Lark.open('tnk.lark',parser='lalr', **kwargs)
+parser = Lark.open('tnk.lark',parser='earley', **kwargs)
 
 
 program = open("tnk_sample02.tnk", **{'encoding': 'iso-8859-1'}).read() +"\n"
