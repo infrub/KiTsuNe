@@ -1,6 +1,6 @@
 single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
-eval_input: rekkyo_rs_expr _NEWLINE*
+eval_input: rekkyo_expr _NEWLINE*
 
 
 
@@ -52,48 +52,18 @@ return_stmt: "return" [rs_expr]
             | assign_stmt
             | just_expr_stmt
 
-declare_with_type_stmt: "var" rekkyo_ls_expr ":" type
-declare_with_value_stmt: "var" rekkyo_ls_expr "=" rekkyo_rs_expr
-declare_with_type_and_value_stmt: "var" rekkyo_ls_expr ":" type "=" rekkyo_rs_expr
-assign_stmt: rekkyo_ls_expr "=" rekkyo_rs_expr
+declare_with_type_stmt: "var" rekkyo_expr ":" type
+declare_with_value_stmt: "var" rekkyo_expr "=" rekkyo_expr
+declare_with_type_and_value_stmt: "var" rekkyo_expr ":" type "=" rekkyo_expr
+assign_stmt: rekkyo_expr "=" rekkyo_expr
 just_expr_stmt: rs_expr
 
 
 
 
 
-// left-side expressions
-rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
-
-?ls_expr: ls_atom_expr
-
-?ls_atom_expr: ls_atom_expr indices    -> setitem
-             | ls_atom_expr "." NAME   -> setattr
-             | ls_atom_expr pointer    -> setpoint
-             | ls_matized_expr
-
-?ls_matized_expr: matizer ls_atom_expr_before_matize         -> left_setmat
-                | ls_atom_expr_before_matize matizer         -> right_setmat
-                | matizer ls_atom_expr_before_matize matizer -> both_setmat
-                | ls_atom_expr_before_matize
-
-?ls_atom_expr_before_matize: ls_atom_expr_before_matize indices       -> setitem
-                           | ls_atom_expr_before_matize "." NAME      -> setattr
-                           | ls_atom_expr_before_matize pointer       -> setpoint
-                           | ls_atom
-
-?ls_atom: "(" ls_tuple_elements ")"  -> settuple
-        | symbol
-
-ls_tuple_elements: ","
-                 | ls_atom_expr ","
-                 | ls_atom_expr ("," ls_atom_expr)+ ","?
-
-
-
-
 // right-side expressions
-rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
+rekkyo_expr: rs_expr ("," rs_expr)* ","?
 ?rs_expr: ternary_expr
 
 ?ternary_expr: or_expr ("if" or_expr "else" ternary_expr)?
