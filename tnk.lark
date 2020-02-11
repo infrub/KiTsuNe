@@ -1,6 +1,6 @@
 single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
-eval_input: rekkyo _NEWLINE*
+eval_input: rekkyo_right_expr _NEWLINE*
 
 
 
@@ -28,7 +28,7 @@ dotted_name: NAME ("." NAME)*
 compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" right_expr ":" suite ("elif" right_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" right_expr ":" suite ["else" ":" suite]
-for_stmt: "for" symbol "in" rekkyo ":" suite ["else" ":" suite]
+for_stmt: "for" symbol "in" right_expr ":" suite ["else" ":" suite]
 funcdef: "proc" NAME "(" parameters ")" [":" type] "=" suite
 classdef: "class" NAME ":" suite
 
@@ -52,15 +52,17 @@ return_stmt: "return" [right_expr]
             | assign_stmt
             | just_expr_stmt
 
-declare_with_type_stmt: "var" left_expr ":" type
-declare_with_value_stmt: "var" left_expr "=" right_expr
-declare_with_type_and_value_stmt: "var" left_expr ":" type "=" right_expr
-assign_stmt: left_expr "=" right_expr
+declare_with_type_stmt: "var" rekkyo_left_expr ":" type
+declare_with_value_stmt: "var" rekkyo_left_expr "=" rekkyo_right_expr
+declare_with_type_and_value_stmt: "var" rekkyo_left_expr ":" type "=" rekkyo_right_expr
+assign_stmt: rekkyo_left_expr "=" rekkyo_right_expr
 just_expr_stmt: right_expr
 
 
 
 // left expressions
+rekkyo_left_expr: [left_expr ("," left_expr)* [","]]
+
 left_expr: left_atom_expr
 
 ?left_atom_expr: atom_expr "[" arguments "]"   -> setitem
@@ -72,6 +74,8 @@ left_expr: left_atom_expr
 
 
 // right expressions
+rekkyo_right_expr: [right_expr ("," right_expr)* [","]]
+
 ?right_expr: or_expr ("if" or_expr "else" right_expr)?
 ?or_expr: xor_expr ("or" xor_expr)*
 ?xor_expr: and_expr ("xor" and_expr)*
@@ -95,8 +99,8 @@ left_expr: left_atom_expr
           | atom_expr "." NAME           -> getattr
           | atom
 
-?atom: "(" [rekkyo] ")" -> tuple
-     | "[" [rekkyo] "]"  -> list
+?atom: "(" rekkyo_right_expr ")" -> tuple
+     | "[" rekkyo_right_expr "]"  -> list
      | symbol
      | number
      | string+
@@ -117,7 +121,6 @@ arguments: [arg ("," arg)* [","]]
 named_arg: symbol "=" right_expr
 unnamed_arg: right_expr
 
-rekkyo: right_expr ("," right_expr)* [","]
 
 
 
