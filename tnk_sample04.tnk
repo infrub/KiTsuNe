@@ -1,0 +1,14 @@
+{l}B[o=0,o=0]{r}
+# is same as
+{l}(B[o=0,o=0]){r}
+
+
+
+
+
+priority is..
+pointer,replacer > matizer
+
+
+matizer のあとに replacer, pointerはおかしい
+そのあとgetattrが来たらまた大丈夫
