@@ -1,5 +1,6 @@
 var A: Tensor[l,r]
-#var A = newTensor[l,r](2,2)
+var A = newTensor[l,r](2,2)
+var S = newSeq[Int]()
 
 A[l=0,r=0] = -J
 A[l=1,r=1] = J
@@ -17,7 +18,7 @@ var V: Tensor[l,o,r]
 {l,o}U{r}, {l}S{r}, {l}V{r,o} = {l,o}B{r,o}.svd(chi)
 
 
-var ket = MPS(A(s>l,e>r,(n,w)>o), B(w>l,s>r,(e,n)>o))
+var ket = MPS(A(s->l,e->r,(n,w)->o), B(w->l,s->r,(e,n)->o))
 
 
 

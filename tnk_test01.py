@@ -18,5 +18,4 @@ program = open("tnk_sample03.tnk", **{'encoding': 'iso-8859-1'}).read() +"\n"
 tree = parser.parse(program)
 
 
-print(tree)
 print(tree.pretty())

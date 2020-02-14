@@ -133,6 +133,7 @@ rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
                         | atom
 
 ?atom: gettuple
+     | type_designed_func
      | symbol
      | number
      | string+
@@ -179,6 +180,29 @@ encoding_decl: NAME
 
 
 // elements
+type_designed_func: _type_designed_func_op "[" type_design_arg "]"
+!_type_designed_func_op: "newSeq"
+
+label_designed_func: _label_designed_func_op "[" label_design_arg "]"
+!_label_designed_func_op: "newTensor" | "newDensor" | "newDiagonalTensor"
+
+
+
+type: NAME | type_designed_type | label_designed_type
+
+type_designed_type: _type_designed_type_op "[" type_design_arg "]"
+!_type_designed_type_op: "Seq"
+
+label_designed_type: _label_designed_type_op "[" label_design_arg "]"
+!_label_designed_type_op: "Tensor" | "Densor" | "DiagonalTensor"
+
+
+
+type_design_arg: type ("," type)* ","?
+label_design_arg: ( | "," | ( NAME "," )+ NAME ","? )
+
+
+
 labels: NAME
       | "(" "," ")"
       | "(" NAME "," ")"
@@ -186,10 +210,6 @@ labels: NAME
 
 label: NAME
 symbol: NAME
-type: NAME
-    | "Seq" "[" type "]" -> typeseq
-    | "Tensor" "[" ( "," | ( NAME "," )+ NAME ","? ) "]" -> typetensor
-    | ("Densor"|"DiagonalTensor") "[" ( "," | ( NAME "," )+ NAME ","? ) "]" -> typedensor
 
 number: DEC_NUMBER
 string: STRING | LONG_STRING
