@@ -1,0 +1,36 @@
+### style A
+
+x = (2+3)*4 # priority
+(x,y) = (y,x) # tuple
+x,y = y,x # implicit tuple
+x = f(10,10) # funccall
+t = ts(i) # seqitem
+A = B((n,w,s)>l,e>r) # replacer
+a = A{l=0,r=0} # pointer
+Amat = [n,w]B[s,e] # matizer
+
+
+
+### style B (this is great!)
+
+x = (2+3)*4 # priority
+(x,y) = (y,x) # tuple
+x,y = y,x # implicit tuple
+x = f(10,10) # funccall
+t = ts[i] # seqitem
+A = B((n,w,s)>l,e>r) # replacer
+a = A[l=0,r=0] # pointer
+Amat = {n,w}B{s,e} # matizer
+
+
+
+### style C
+
+x = (2+3)*4 # priority
+(x,y) = (y,x) # tuple
+x,y = y,x # implicit tuple
+x = f(10,10) # funccall
+t = ts(i) # seqitem
+A = B((n,w,s)>l,e>r) # replacer
+a = A[l=0,r=0] # pointer
+Amat = {n,w}B{s,e} # matizer

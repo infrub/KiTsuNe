@@ -29,7 +29,7 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" rs_expr ":" suite ("elif" rs_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" rs_expr ":" suite ["else" ":" suite]
 for_stmt: "for" symbol "in" rs_expr ":" suite ["else" ":" suite]
-funcdef: "proc" symbol parameters [":" type] "=" suite
+funcdef: ("proc"|"def") symbol parameters [":" rekkyo_type] "=" suite
 classdef: "class" symbol ":" suite
 
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
@@ -41,7 +41,7 @@ suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 pass_stmt: "pass"
 break_stmt: "break"
 continue_stmt: "continue"
-return_stmt: "return" [rs_expr]
+return_stmt: "return" [rekkyo_rs_expr]
 
 
 
@@ -66,7 +66,7 @@ rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
 ?ls_expr: ls_atom_expr
 
 ?ls_atom_expr: ls_atom_expr itemer         -> setitem
-             | ls_atom_expr "." symbol   -> setattr
+             | ls_atom_expr "." symbol     -> setattr
              | ls_atom_expr pointer        -> setpoint
              | ls_matized_expr
 
@@ -149,7 +149,8 @@ gettuple: "(" "," ")"
 
 // callers
 parameters: "(" [param_unit ("," param_unit)* [","]] ")"
-?param_unit: symbol ":" type ["=" rs_expr]
+?param_unit: rekkyo_symbol ":" type ["=" rs_expr]
+rekkyo_symbol: symbol ( "," symbol)*
 
 arguments: "(" [arg_unit ("," arg_unit)* [","]] ")"
 ?arg_unit: named_arg_unit | unnamed_arg_unit
@@ -168,6 +169,8 @@ replacer: "(" replacer_unit ("," replacer_unit)* [","] ")"
 matizer: "{" [matizer_unit ("," matizer_unit)* [","]] "}"
 ?matizer_unit: label
 
+rekkyo_type: type ( "," type)*
+
 
 
 // omajinai
@@ -184,6 +187,9 @@ labels: NAME
 label: NAME
 symbol: NAME
 type: NAME
+    | "Seq" "[" type "]" -> typeseq
+    | "Tensor" "[" ( "," | ( NAME "," )+ NAME ","? ) "]" -> typetensor
+    | ("Densor"|"DiagonalTensor") "[" ( "," | ( NAME "," )+ NAME ","? ) "]" -> typedensor
 
 number: DEC_NUMBER
 string: STRING | LONG_STRING
