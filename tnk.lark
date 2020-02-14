@@ -1,6 +1,6 @@
 single_input: _NEWLINE | simple_stmt | compound_stmt _NEWLINE
 file_input: (_NEWLINE | stmt)*
-eval_input: rekkyo_expr _NEWLINE*
+eval_input: rekkyo_rs_expr _NEWLINE*
 
 
 
@@ -16,11 +16,11 @@ import_stmt: import_name | import_from
 import_name: "import" dotted_as_names
 import_from: "from" (dots? dotted_name | dots) "import" ("*" | "(" import_as_names ")" | import_as_names)
 !dots: "."+
-import_as_name: NAME ["as" NAME]
-dotted_as_name: dotted_name ["as" NAME]
+import_as_name: symbol ["as" symbol]
+dotted_as_name: dotted_name ["as" symbol]
 import_as_names: import_as_name ("," import_as_name)* [","]
 dotted_as_names: dotted_as_name ("," dotted_as_name)*
-dotted_name: NAME ("." NAME)*
+dotted_name: symbol ("." symbol)*
 
 
 
@@ -29,8 +29,8 @@ compound_stmt: if_stmt | while_stmt | for_stmt | funcdef | classdef
 if_stmt: "if" rs_expr ":" suite ("elif" rs_expr ":" suite)* ["else" ":" suite]
 while_stmt: "while" rs_expr ":" suite ["else" ":" suite]
 for_stmt: "for" symbol "in" rs_expr ":" suite ["else" ":" suite]
-funcdef: "proc" NAME parameters [":" type] "=" suite
-classdef: "class" NAME ":" suite
+funcdef: "proc" symbol parameters [":" type] "=" suite
+classdef: "class" symbol ":" suite
 
 suite: simple_stmt | _NEWLINE _INDENT stmt+ _DEDENT
 
@@ -50,20 +50,47 @@ return_stmt: "return" [rs_expr]
             | declare_with_value_stmt
             | declare_with_type_and_value_stmt
             | assign_stmt
-            | just_expr_stmt
+            | discard_stmt
 
-declare_with_type_stmt: "var" rekkyo_expr ":" type
-declare_with_value_stmt: "var" rekkyo_expr "=" rekkyo_expr
-declare_with_type_and_value_stmt: "var" rekkyo_expr ":" type "=" rekkyo_expr
-assign_stmt: rekkyo_expr "=" rekkyo_expr
-just_expr_stmt: rs_expr
+declare_with_type_stmt: "var" rekkyo_ls_expr ":" type
+declare_with_value_stmt: "var" rekkyo_ls_expr "=" rekkyo_rs_expr
+declare_with_type_and_value_stmt: "var" rekkyo_ls_expr ":" type "=" rekkyo_rs_expr
+assign_stmt: rekkyo_ls_expr "=" rekkyo_rs_expr
+discard_stmt: "discard" rs_expr
 
 
+
+// left-side expressions
+rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
+
+?ls_expr: ls_atom_expr
+
+?ls_atom_expr: ls_atom_expr itemer         -> setitem
+             | ls_atom_expr "." symbol   -> setattr
+             | ls_atom_expr pointer        -> setpoint
+             | ls_matized_expr
+
+?ls_matized_expr: matizer ls_atom_expr_before_matize         -> left_setmat
+                | ls_atom_expr_before_matize matizer         -> right_setmat
+                | matizer ls_atom_expr_before_matize matizer -> both_setmat
+                | ls_atom_expr_before_matize
+
+?ls_atom_expr_before_matize: ls_atom_expr_before_matize itemer        -> setitem
+                           | ls_atom_expr_before_matize "mo." symbol  -> setattr
+                           | ls_atom_expr_before_matize pointer       -> setpoint
+                           | ls_atom
+
+?ls_atom: settuple
+        | symbol
+
+settuple: "(" "," ")"
+        | "(" ls_atom_expr "," ")"
+        | "(" ls_atom_expr ("," ls_atom_expr)+ ","? ")"
 
 
 
 // right-side expressions
-rekkyo_expr: rs_expr ("," rs_expr)* ","?
+rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
 ?rs_expr: ternary_expr
 
 ?ternary_expr: or_expr ("if" or_expr "else" ternary_expr)?
@@ -87,8 +114,8 @@ rekkyo_expr: rs_expr ("," rs_expr)* ","?
 
 
 ?atom_expr: atom_expr arguments  -> funccall
-          | atom_expr indices    -> getitem
-          | atom_expr "." NAME   -> getattr
+          | atom_expr itemer     -> getitem
+          | atom_expr "." symbol -> getattr
           | atom_expr pointer    -> getpoint
           | atom_expr replacer   -> replace
           | matized_expr
@@ -99,13 +126,13 @@ rekkyo_expr: rs_expr ("," rs_expr)* ","?
              | atom_expr_before_matize
 
 ?atom_expr_before_matize: atom_expr_before_matize arguments     -> funccall
-                        | atom_expr_before_matize indices       -> getitem
-                        | atom_expr_before_matize "." NAME      -> getattr
+                        | atom_expr_before_matize itemer        -> getitem
+                        | atom_expr_before_matize "." symbol    -> getattr
                         | atom_expr_before_matize pointer       -> getpoint
                         | atom_expr_before_matize replacer      -> replace
                         | atom
 
-?atom: "(" tuple_elements ")"  -> gettuple
+?atom: gettuple
      | symbol
      | number
      | string+
@@ -114,9 +141,9 @@ rekkyo_expr: rs_expr ("," rs_expr)* ","?
      | "True"    -> const_true
      | "False"   -> const_false
 
-tuple_elements: ","
-              | ternary_expr ","
-              | ternary_expr ("," ternary_expr)+ ","?
+gettuple: "(" "," ")"
+        | "(" ternary_expr "," ")"
+        | "(" ternary_expr ("," ternary_expr)+ ","? ")"
 
 
 
@@ -129,7 +156,7 @@ arguments: "(" [arg_unit ("," arg_unit)* [","]] ")"
 named_arg_unit: symbol "=" rs_expr
 unnamed_arg_unit: rs_expr
 
-indices: "[" index_unit ("," index_unit)* [","] "]"
+itemer: "[" index_unit ("," index_unit)* [","] "]"
 ?index_unit: rs_expr
 
 pointer: "[" [pointer_unit ("," pointer_unit)* [","]] "]"

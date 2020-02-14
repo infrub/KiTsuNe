@@ -2,22 +2,22 @@ var a = 1
 proc f(x:int,y:int=10):int=
     for i in range(x,y):
         if i % 3 == 0:
-            print(i)
+            discard print(i)
     return x
 
 b,c = 4,5+2*3
-print(b[0])
+discard print(b[0])
 
 
 proc funi()=
     while True:
-        print("funi~")
+        discard print("funi~")
 
 
-1+3*5>=2 or a*7 is True and c!=1
+discard 1+3*5>=2 or a*7 is True and c!=1
 
-3^2^4
+discard 3^2^4
 
-not -3^2
+discard not -3^2
 
-3 - 2 - 4
+discard 3 - 2 - 4
