@@ -6,7 +6,7 @@ proc f(x:int,y:int=10):int=
     return x
 
 b,c = 4,5+2*3
-discard print(b[0])
+discard print(b(0))
 
 
 proc funi()=

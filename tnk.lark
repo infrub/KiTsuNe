@@ -65,7 +65,7 @@ rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
 
 ?ls_expr: ls_atom_expr
 
-?ls_atom_expr: ls_atom_expr itemer         -> setitem
+?ls_atom_expr: ls_atom_expr arguments      -> setcall
              | ls_atom_expr "." symbol     -> setattr
              | ls_atom_expr pointer        -> setpoint
              | ls_matized_expr
@@ -75,7 +75,7 @@ rekkyo_ls_expr: ls_expr ("," ls_expr)* ","?
                 | matizer ls_atom_expr_before_matize matizer -> both_setmat
                 | ls_atom_expr_before_matize
 
-?ls_atom_expr_before_matize: ls_atom_expr_before_matize itemer        -> setitem
+?ls_atom_expr_before_matize: ls_atom_expr_before_matize arguments     -> setcall
                            | ls_atom_expr_before_matize "mo." symbol  -> setattr
                            | ls_atom_expr_before_matize pointer       -> setpoint
                            | ls_atom
@@ -113,8 +113,7 @@ rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
 
 
 
-?atom_expr: atom_expr arguments  -> funccall
-          | atom_expr itemer     -> getitem
+?atom_expr: atom_expr arguments  -> getcall
           | atom_expr "." symbol -> getattr
           | atom_expr pointer    -> getpoint
           | atom_expr replacer   -> replace
@@ -125,17 +124,17 @@ rekkyo_rs_expr: rs_expr ("," rs_expr)* ","?
              | matizer atom_expr_before_matize matizer -> both_getmat
              | atom_expr_before_matize
 
-?atom_expr_before_matize: atom_expr_before_matize arguments     -> funccall
-                        | atom_expr_before_matize itemer        -> getitem
+?atom_expr_before_matize: atom_expr_before_matize arguments     -> getcall
                         | atom_expr_before_matize "." symbol    -> getattr
                         | atom_expr_before_matize pointer       -> getpoint
                         | atom_expr_before_matize replacer      -> replace
                         | atom
 
-?atom: gettuple
-     | type_designed_func
+?atom: number
      | symbol
-     | number
+     | type_designed_func
+     | label_designed_func
+     | gettuple
      | string+
      | "(" rs_expr ")"
      | "None"    -> const_none
@@ -157,9 +156,6 @@ arguments: "(" [arg_unit ("," arg_unit)* [","]] ")"
 ?arg_unit: named_arg_unit | unnamed_arg_unit
 named_arg_unit: symbol "=" rs_expr
 unnamed_arg_unit: rs_expr
-
-itemer: "[" index_unit ("," index_unit)* [","] "]"
-?index_unit: rs_expr
 
 pointer: "[" [pointer_unit ("," pointer_unit)* [","]] "]"
 ?pointer_unit: label "=" rs_expr
@@ -199,7 +195,7 @@ label_designed_type: _label_designed_type_op "[" label_design_arg "]"
 
 
 type_design_arg: type ("," type)* ","?
-label_design_arg: ( | "," | ( NAME "," )+ NAME ","? )
+label_design_arg: ( | "," | ( NAME "," )* NAME ","? )
 
 
 

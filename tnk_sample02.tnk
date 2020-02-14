@@ -1,8 +1,7 @@
 x = (2+3)*4 # priority
 (x,y) = (y,x) # tuple
 x,y = y,x # implicit tuple
-x = f(10,10*j) # funccall (allow empty)
-t = ts[i] # seqitem (DONT allow empty)
+x = f(10,10*j) # call (allow empty)
 A = B((n,w,s)->l,e->r) # replacer (DONT allow empty)
 a = A[l=0,r=0] # pointer (allow empty)
 Amat = {n,w}B{s,e} # matizer (allow empty)

@@ -41,4 +41,6 @@ def svd_again(A:Tensor[l,r,u,d],B:Tensor[l,r,u,d],L,R:DiagonalTensor[l,r],U,D:Di
     {l,r,u}B{d} = {l,r,u}B{d} / {u}U{d}
     {l,r,d}B{u} = {l,r,d}B{u} / {d}D{u}
 
+    discard print(A)
+
     return A,L,B
