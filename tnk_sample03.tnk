@@ -44,3 +44,16 @@ def svd_again(A:Tensor[l,r,u,d],B:Tensor[l,r,u,d],L,R:DiagonalTensor[l,r],U,D:Di
     discard print(A)
 
     return A,L,B
+
+
+for i in range(30):
+    var x: String
+    if i % 15 == 0:
+        x = "FizzBuzz"
+    elif i%3==0:
+        x = "Fizz"
+    elif i%5==0:
+        x = "Buzz"
+    else:
+        x = String(i)
+    discard print(x)
