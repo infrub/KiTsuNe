@@ -39,6 +39,29 @@ class Variable:
         typnam = str(self.typ)[8:-2]
         return f"{typnam}({self.value})"
 
+    def __add__(self,other):
+        value = self.value + other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __sub__(self,other):
+        value = self.value - other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __mul__(self,other):
+        value = self.value * other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __truediv__(self,other):
+        value = self.value / other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+
+
+
 # Bool, Int, Float, Complex, Seq[...], Tensor[...]
 
 
@@ -73,10 +96,10 @@ class Scope:
             return
         self._parent_scope.assign(key, value)
 
-    def declare(self, key, typ, value):
+    def declare(self, key, value):
         if self.defined_in_this_scope(key):
             raise TNKNameError(f"Name {key} is already defined in this scope.")
-        self._dct[key] = Variable(typ, value)
+        self._dct[key] = value
 
 
 class NullScope(Scope):
@@ -92,7 +115,7 @@ class NullScope(Scope):
     def assign(self, key, value):
         raise TNKNameError(f"Name {key} is not defined.")
 
-    def declare(self, key, typ, value):
+    def declare(self, key, value):
         raise TNKNameError(f"Name {key} is already defined in this scope.")
 
 
@@ -111,7 +134,7 @@ class Visitor():
     def _declare_with_value(self, k, v, env):
         key = k.children[0].value
         value = self._visit(v, env)
-        env.declare(key, type(value), value)
+        env.declare(key, value)
 
     def declare_with_value_stmt(self, tree, env):
         for k,v in zip(tree.children[0].children, tree.children[1].children):
@@ -122,16 +145,36 @@ class Visitor():
         return env.get(key)
 
     def dec_number(self, tree, env):
-        value = tree.children[0].value
-        return int(tree.children[0].value)
+        v = tree.children[0].value
+        return Variable(int, int(v))
 
     def float_number(self, tree, env):
-        value = tree.children[0].value
-        return float(tree.children[0].value)
+        v = tree.children[0].value
+        return Variable(float, float(v))
 
     def complex_number(self, tree, env):
-        value = tree.children[0].value
-        return complex(tree.children[0].value)
+        v = tree.children[0].value
+        return Variable(complex, complex(v))
+
+    def addsub_expr(self, tree, env):
+        left = self._visit(tree.children[0], env)
+        op = tree.children[1]
+        right = self._visit(tree.children[2], env)
+        if op == "+":
+            return left + right
+        elif op == "-":
+            return left - right
+
+    def muldiv_expr(self, tree, env):
+        left = self._visit(tree.children[0], env)
+        op = tree.children[1]
+        right = self._visit(tree.children[2], env)
+        if op == "*":
+            return left * right
+        elif op == "/":
+            return left / right
+
+
 
 visitor = Visitor()
 print(visitor.program(tree))
