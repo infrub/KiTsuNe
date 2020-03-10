@@ -131,6 +131,19 @@ class Visitor():
         f = getattr(self, tree.data)
         return f(tree, env)
 
+    def _declare_with_type(self, k, typ, env):
+        key = k.children[0].value
+        value = Variable(typ, None)
+        env.declare(key, value)
+
+    def declare_with_type_stmt(self, tree, env):
+        typ = self._visit(tree.children[1], env)
+        print(typ)
+        for k in tree.children[0].children:
+            self._declare_with_type(k, typ, env)
+
+
+
     def _declare_with_value(self, k, v, env):
         key = k.children[0].value
         value = self._visit(v, env)
@@ -140,9 +153,30 @@ class Visitor():
         for k,v in zip(tree.children[0].children, tree.children[1].children):
             self._declare_with_value(k, v, env)
 
+    def _assign(self, k, v, env):
+        key = k.children[0].value
+        value = self._visit(v, env)
+        env.assign(key, value)
+
+    def assign_stmt(self, tree, env):
+        for k,v in zip(tree.children[0].children, tree.children[1].children):
+            self._assign(k, v, env)
+
     def symbol(self, tree, env):
         key = tree.children[0].value
         return env.get(key)
+
+    def simple_type(self, tree, env):
+        if tree.children[0].value == "Bool":
+            return bool
+        elif tree.children[0].value == "Int":
+            return int
+        elif tree.children[0].value == "Float":
+            return float
+        elif tree.children[0].value == "Complex":
+            return complex
+        else:
+            assert False
 
     def dec_number(self, tree, env):
         v = tree.children[0].value
@@ -164,6 +198,8 @@ class Visitor():
             return left + right
         elif op == "-":
             return left - right
+        else:
+            assert False
 
     def muldiv_expr(self, tree, env):
         left = self._visit(tree.children[0], env)
@@ -173,6 +209,8 @@ class Visitor():
             return left * right
         elif op == "/":
             return left / right
+        else:
+            assert False
 
 
 

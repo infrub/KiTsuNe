@@ -184,7 +184,9 @@ label_designed_func: _label_designed_func_op "[" label_design_arg "]"
 
 
 
-type: NAME | type_designed_type | label_designed_type
+?type: simple_type | type_designed_type | label_designed_type
+
+simple_type: NAME
 
 type_designed_type: _type_designed_type_op "[" type_design_arg "]"
 !_type_designed_type_op: "Seq"
