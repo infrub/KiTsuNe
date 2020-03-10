@@ -26,6 +26,20 @@ print(tree.pretty())
 class TNKNameError(Exception):
     pass
 
+
+class SeqType:
+    def __init__(self, oftyp):
+        self.oftyp = oftyp
+
+    def __str__(self):
+        typnam = str(self.oftyp)[8:-2]
+        return f"<class 'Seq[{typnam}]'>"
+
+    def __repr__(self):
+        typnam = str(self.oftyp)[8:-2]
+        return f"<class 'Seq[{typnam}]'>"
+
+
 class Variable:
     def __init__(self, typ, value):
         self.typ = typ
@@ -177,6 +191,23 @@ class Visitor():
             return complex
         else:
             assert False
+
+    def type_designed_type(self, tree, env):
+        if tree.children[0].value == "Seq":
+            a = self._visit(tree.children[1], env)
+            if len(a) != 1:
+                raise
+            return SeqType(a[0])
+
+    def type_design_arg(self, tree, env):
+        return tuple(self._visit(child, env) for child in tree.children)
+
+    def label_designed_type(self, tree, env):
+        if tree.children[0].value == "Tensor":
+            a = self._visit(tree.children[1], env)
+            return Tensor(a)
+
+
 
     def dec_number(self, tree, env):
         v = tree.children[0].value

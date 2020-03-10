@@ -6,3 +6,5 @@ var c = a + b * 3
 b = c
 
 var d: Int
+
+var e: Seq[Int]
