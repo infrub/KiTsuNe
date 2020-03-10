@@ -207,7 +207,10 @@ labels: NAME
 label: NAME
 symbol: NAME
 
-number: DEC_NUMBER
+?number: dec_number | float_number | complex_number
+dec_number: DEC_NUMBER
+float_number: FLOAT_NUMBER
+complex_number: COMPLEX_NUMBER
 string: STRING | LONG_STRING
 
 NAME: /[a-zA-Z_]\w*/
@@ -218,6 +221,8 @@ STRING : /[ubf]?r?("(?!"").*?(?<!\\)(\\\\)*?"|'(?!'').*?(?<!\\)(\\\\)*?')/i
 LONG_STRING: /[ubf]?r?(""".*?(?<!\\)(\\\\)*?"""|'''.*?(?<!\\)(\\\\)*?''')/is
 
 DEC_NUMBER: /0|[1-9]\d*/i
+FLOAT_NUMBER.2: /((\d+\.\d*|\.\d+)(e[-+]?\d+)?|\d+(e[-+]?\d+))/i
+COMPLEX_NUMBER.2: /\d+j/i | FLOAT_NUMBER "j"i
 
 
 %ignore /[\t \f]+/  // WS
