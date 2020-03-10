@@ -36,8 +36,28 @@ class SeqType:
         return f"<class 'Seq[{typnam}]'>"
 
     def __repr__(self):
-        typnam = str(self.oftyp)[8:-2]
-        return f"<class 'Seq[{typnam}]'>"
+        return str(self)
+
+
+class TensorType:
+    def __init__(self, labels):
+        self.labels = labels
+
+    def __str__(self):
+        if len(self.labels) == 0:
+            a = "<class 'Tensor[]'>"
+        else:
+            a = "<class 'Tensor["
+            for label in self.labels:
+                a += label + ","
+            a = a[:-1]
+            a += "]'>"
+        return a
+
+    def __repr__(self):
+        return str(self)
+
+
 
 
 class Variable:
@@ -205,7 +225,11 @@ class Visitor():
     def label_designed_type(self, tree, env):
         if tree.children[0].value == "Tensor":
             a = self._visit(tree.children[1], env)
-            return Tensor(a)
+            print(a,type(a))
+            return TensorType(a)
+
+    def label_design_arg(self, tree, env):
+        return tuple(child.value for child in tree.children)
 
 
 

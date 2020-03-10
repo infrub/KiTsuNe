@@ -8,3 +8,5 @@ b = c
 var d: Int
 
 var e: Seq[Int]
+
+var f: Tensor[a,b]
