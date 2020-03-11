@@ -73,6 +73,14 @@ class Variable:
         typnam = str(self.typ)[8:-2]
         return f"{typnam}({self.value})"
 
+    """
+    def __getattr__(self,name):
+        def f(other):
+            value = self.value.__getattr__(name)(other.value)
+            typ = type(value)
+            return Variable(typ, value)
+        return f
+    """
     def __add__(self,other):
         value = self.value + other.value
         typ = type(value)
@@ -93,6 +101,30 @@ class Variable:
         typ = type(value)
         return Variable(typ, value)
 
+    def __eq__(self,other):
+        value = self.value == other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __lt__(self,other):
+        value = self.value < other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __gt__(self,other):
+        value = self.value > other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __leq__(self,other):
+        value = self.value <= other.value
+        typ = type(value)
+        return Variable(typ, value)
+
+    def __leq__(self,other):
+        value = self.value >= other.value
+        typ = type(value)
+        return Variable(typ, value)
 
 
 
@@ -165,6 +197,30 @@ class Visitor():
         f = getattr(self, tree.data)
         return f(tree, env)
 
+
+
+
+    def compound_stmt(self, tree, env):
+        self._visit(tree.children[0], env)
+
+    def if_stmt(self, tree, env):
+        flag = False
+        for i in range(len(tree.children)//2):
+            cond = self._visit(tree.children[i*2], env)
+            if cond.value == True:
+                self._visit(tree.children[i*2+1], env)
+                flag = True
+                break
+        if not flag and len(tree.children) % 2 == 1:
+            self._visit(tree.children[-1], env)
+
+
+    def suite(self, tree, env):
+        for child in tree.children:
+            self._visit(child, env)
+
+
+
     def _declare_with_type(self, k, typ, env):
         key = k.children[0].value
         value = Variable(typ, None)
@@ -172,11 +228,8 @@ class Visitor():
 
     def declare_with_type_stmt(self, tree, env):
         typ = self._visit(tree.children[1], env)
-        print(typ)
         for k in tree.children[0].children:
             self._declare_with_type(k, typ, env)
-
-
 
     def _declare_with_value(self, k, v, env):
         key = k.children[0].value
@@ -196,21 +249,16 @@ class Visitor():
         for k,v in zip(tree.children[0].children, tree.children[1].children):
             self._assign(k, v, env)
 
+
+
+
     def symbol(self, tree, env):
         key = tree.children[0].value
         return env.get(key)
 
-    def simple_type(self, tree, env):
-        if tree.children[0].value == "Bool":
-            return bool
-        elif tree.children[0].value == "Int":
-            return int
-        elif tree.children[0].value == "Float":
-            return float
-        elif tree.children[0].value == "Complex":
-            return complex
-        else:
-            assert False
+
+
+
 
     def type_designed_type(self, tree, env):
         if tree.children[0].value == "Seq":
@@ -225,25 +273,25 @@ class Visitor():
     def label_designed_type(self, tree, env):
         if tree.children[0].value == "Tensor":
             a = self._visit(tree.children[1], env)
-            print(a,type(a))
             return TensorType(a)
 
     def label_design_arg(self, tree, env):
         return tuple(child.value for child in tree.children)
 
+    def simple_type(self, tree, env):
+        if tree.children[0].value == "Bool":
+            return bool
+        elif tree.children[0].value == "Int":
+            return int
+        elif tree.children[0].value == "Float":
+            return float
+        elif tree.children[0].value == "Complex":
+            return complex
+        else:
+            assert False
 
 
-    def dec_number(self, tree, env):
-        v = tree.children[0].value
-        return Variable(int, int(v))
 
-    def float_number(self, tree, env):
-        v = tree.children[0].value
-        return Variable(float, float(v))
-
-    def complex_number(self, tree, env):
-        v = tree.children[0].value
-        return Variable(complex, complex(v))
 
     def addsub_expr(self, tree, env):
         left = self._visit(tree.children[0], env)
@@ -266,6 +314,41 @@ class Visitor():
             return left / right
         else:
             assert False
+
+    def comparison_expr(self, tree, env):
+        left = self._visit(tree.children[0], env)
+        op = tree.children[1]
+        right = self._visit(tree.children[2], env)
+        if op == "==": return left == right
+        elif op == "<": return left < right
+        elif op == ">": return left > right
+        elif op == ">=": return left >= right
+        elif op == "<=": return left <= right
+        elif op == "!=": return left != right
+        else: assert False
+
+
+
+
+
+    def dec_number(self, tree, env):
+        v = tree.children[0].value
+        return Variable(int, int(v))
+
+    def float_number(self, tree, env):
+        v = tree.children[0].value
+        return Variable(float, float(v))
+
+    def complex_number(self, tree, env):
+        v = tree.children[0].value
+        return Variable(complex, complex(v))
+
+    def const_true(self, tree, env):
+        return Variable(bool, True)
+
+    def const_false(self, tree, env):
+        return Variable(bool, False)
+
 
 
 

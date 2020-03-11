@@ -6,7 +6,12 @@ var c = a + b * 3
 b = c
 
 var d: Int
-
 var e: Seq[Int]
-
 var f: Tensor[a,b]
+
+if b > c:
+    d = 0
+elif b == c:
+    d = 1
+else:
+    d = 2
