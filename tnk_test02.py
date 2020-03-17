@@ -121,14 +121,10 @@ class Variable:
         typ = type(value)
         return Variable(typ, value)
 
-    def __leq__(self,other):
+    def __geq__(self,other):
         value = self.value >= other.value
         typ = type(value)
         return Variable(typ, value)
-
-
-
-# Bool, Int, Float, Complex, Seq[...], Tensor[...]
 
 
 
@@ -213,6 +209,15 @@ class Visitor():
                 break
         if not flag and len(tree.children) % 2 == 1:
             self._visit(tree.children[-1], env)
+
+    def while_stmt(self, tree, env):
+        cond_expr = tree.children[0]
+        nakami_expr = tree.children[1]
+        while True:
+            if self._visit(cond_expr,env).value == False:
+                break
+            deep_env = Scope(env)
+            self._visit(nakami_expr, deep_env)
 
 
     def suite(self, tree, env):
