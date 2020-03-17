@@ -19,5 +19,8 @@ else:
 
 while a < 5:
     d = a
+    discard print(d)
     var g = a
     a = a + 1
+
+discard print(3)

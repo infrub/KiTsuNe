@@ -128,6 +128,25 @@ class Variable:
 
 
 
+class Function:
+    def __init__(self, param_keys, tree, env):
+        self.param_keys = list(param_keys)
+        self.tree = tree
+        self.env = env
+
+    def execute(self, arg_values):
+        if hasattr(self, "special_execute"):
+            return self.special_execute(arg_values)
+        else:
+            return self.usual_execute(arg_values)
+
+    def usual_execute(self, arg_values):
+        deep_env = Scope(self.env)
+        vi = Visitor()
+        for (param_key, arg_value) in zip(self.param_keys, self.arg_values):
+            vi._assign(param_key, arg_value)
+        return vi._visit(tree, deep_env)
+
 
 
 class Scope:
@@ -172,6 +191,9 @@ class NullScope(Scope):
         return False
 
     def get(self, key):
+        print_func = Function(["hoge"],[],NullScope())
+        print_func.usual_execute = lambda arg_values: print(*arg_values)
+        if key == "print": return print_func
         raise TNKNameError(f"Name {key} is not defined.")
 
     def assign(self, key, value):
@@ -187,7 +209,7 @@ class Visitor():
         scope = Scope()
         for sub_tree in tree.children:
             self._visit(sub_tree, scope)
-        print(scope)
+        #print(scope)
 
     def _visit(self, tree, env):
         f = getattr(self, tree.data)
@@ -219,11 +241,9 @@ class Visitor():
             deep_env = Scope(env)
             self._visit(nakami_expr, deep_env)
 
-
     def suite(self, tree, env):
         for child in tree.children:
             self._visit(child, env)
-
 
 
     def _declare_with_type(self, k, typ, env):
@@ -253,6 +273,23 @@ class Visitor():
     def assign_stmt(self, tree, env):
         for k,v in zip(tree.children[0].children, tree.children[1].children):
             self._assign(k, v, env)
+
+    def discard_stmt(self, tree, env):
+        hoge = self._visit(tree.children[0], env)
+        del hoge
+
+
+    def getcall(self, tree, env):
+        func = self._visit(tree.children[0], env)
+        args = self._visit(tree.children[1], env)
+        return func.execute(args)
+
+    def arguments(self, tree, env):
+        args = [self._visit(child, env) for child in tree.children]
+        return args
+
+    def unnamed_arg_unit(self, tree, env):
+        return self._visit(tree.children[0], env)
 
 
 
@@ -358,4 +395,4 @@ class Visitor():
 
 
 visitor = Visitor()
-print(visitor.program(tree))
+visitor.program(tree)
