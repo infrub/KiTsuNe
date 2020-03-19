@@ -18,7 +18,17 @@ var V: Tensor[l,o,r]
 {l,o}U{r}, {l}S{r}, {l}V{r,o} = {l,o}B{r,o}.svd(chi)
 
 
-var ket = MPS(A(s->l,e->r,(n,w)->o), B(w->l,s->r,(e,n)->o))
+
+class MPS = object
+    tensors: Seq[Tensor[l,r,o]]
+
+def newMPS(tensors:Seq[Tensor[l,r,o]]):MPS =
+    result = new MPS()
+    result.tensors = Seq[Tensor[l,r,o]]
+    return result
+
+
+var ket = newMPS([A(s->l,e->r,(n,w)->o), B(w->l,s->r,(e,n)->o)])
 
 
 
